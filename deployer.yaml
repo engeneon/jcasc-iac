@@ -1,0 +1,95 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  namespace: orion
+spec:
+  selector:
+    matchLabels:
+      app: jenkins
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      serviceAccountName: internal-kubectl
+      containers:
+      - name: jenkins
+        image: quay.io/engeneon/jenkins-eip:0.0.29d4
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: USER
+          value: "gomonkey"
+        - name: PASSWORD
+          value: "h4n00m4n"
+        - name: ORGANISATION
+          value: "EIP"
+        ports:
+          - name: tcp-8080
+            containerPort: 8080
+      imagePullSecrets:
+      - name: engeneon-pull-secret
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: jenkins-service
+  namespace: orion
+spec:
+  type: NodePort
+  selector:
+    app: jenkins
+  ports:
+    - name: tcp-80
+      port: 8080
+      nodePort: 30889
+      protocol: TCP
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: modify-pods-to-sa
+  namespace: orion
+subjects:
+  - kind: ServiceAccount
+    name: internal-kubectl
+roleRef:
+  kind: Role
+  name: modify-pods
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: modify-pods
+  namespace: orion
+rules:
+  - apiGroups: ["apps","extensions",""]
+    resources:
+      - deployments
+      - pods
+      - services
+      - rolebindings
+      - roles
+      - pvc
+      - pv
+    verbs:
+      - get
+      - watch
+      - list
+      - patch
+      - delete
+      - restart
+      - create
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: internal-kubectl
+  namespace: orion

@@ -1,0 +1,29 @@
+FROM jenkins/jenkins:2.346.1-jdk17-preview
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
+COPY casc.yaml /var/jenkins_home/casc.yaml
+COPY eip-enterprise-caf-level0.groovy /usr/local/eip-enterprise-caf-level0.groovy
+COPY eip-enterprise-caf-level1.groovy /usr/local/eip-enterprise-caf-level1.groovy
+COPY eip-enterprise-caf-level2.groovy /usr/local/eip-enterprise-caf-level2.groovy
+COPY eip-enterprise-caf-level3.groovy /usr/local/eip-enterprise-caf-level3.groovy
+USER root
+RUN apt-get clean && apt-get update && apt-get install -y gnupg software-properties-common
+RUN apt-get clean && apt-get update
+RUN apt-get -y install ca-certificates curl apt-transport-https lsb-release gnupg
+RUN apt-get -y install kubernetes-client
+RUN apt-get -y install netcat
+RUN apt-get -y install jq
+RUN apt-get -y install bash
+RUN apt-get -y install unzip
+RUN apt-get -y install curl
+RUN apt-get -y install docker
+RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null
+RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
+RUN apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+ENV AZ_REPO="bionic"
+RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | tee /etc/apt/sources.list.d/azure-cli.list
+RUN apt-get update && apt-get install azure-cli
+RUN apt-get install terraform && terraform -version docker
+RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && chmod 700 get_helm.sh && ./get_helm.sh
+#Consider: apt-get install azure-cli=<version>-1~bullseye
+USER jenkins

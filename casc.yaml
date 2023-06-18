@@ -1,0 +1,59 @@
+unclassified:
+  location:
+    url: http://0.0.0.0:8888/
+security:
+  scriptApproval:
+    approvedSignatures:
+    - staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods putAt java.lang.Object java.lang.String java.lang.Object
+jenkins:
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        # create a user called admin
+        - id: "adminator"
+          password: "cr4ckh4mm3rm0nk3ybunz"
+  authorizationStrategy: loggedInUsersCanDoAnything
+
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+      - usernamePassword:
+          id: "BITBUCKET_COMMON_CREDS"
+          username: "yyyyyyyyyyyyyy"
+          password: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          description: "GitHub Repo Access Key"
+          scope: GLOBAL
+      - usernamePassword:
+          id: "DOCKERHUB_CREDENTIALS"
+          username: "dockerhub username"
+          password: "dockerhub password"
+          description: "Dockerhub Repo Access Key"
+          scope: GLOBAL
+
+#Test this for concurrent run of pipelines
+#Ensure at least 1 executor available
+#pipelines:
+#  numExecutors: 1
+
+#Job Definitions using job-dsl plugin
+jobs:
+  - file: /usr/local/bootstrap-levels.groovy
+  - file: /usr/local/eip-enterprise-caf-level0-certificate-rotation.groovy
+  - file: /usr/local/eip-enterprise-caf-level0.groovy
+  - file: /usr/local/eip-enterprise-destroy-level0.groovy
+  - file: /usr/local/eip-enterprise-caf-level1.groovy
+  - file: /usr/local/eip-enterprise-destroy-level1.groovy
+  - file: /usr/local/eip-enterprise-caf-level2.groovy
+  - file: /usr/local/eip-enterprise-caf-level3.groovy
+  - file: /usr/local/eip-enterprise-caf-cust000-app001.groovy
+  - file: /usr/local/eip-enterprise-caf-cust001-app000.groovy
+  - file: /usr/local/eip-enterprise-caf-rbac-management.groovy
+  - file: /usr/local/eip-enterprise-caf-level0-test.groovy
+  - file: /usr/local/eip-enterprise-caf-level1-test.groovy
+  - file: /usr/local/eip-enterprise-caf-level2-test.groovy
+  - file: /usr/local/eip-enterprise-caf-level3-test.groovy
+  - file: /usr/local/eip-enterprise-caf-lz-provisioner-deploy.groovy
+  - file: /usr/local/eip-enterprise-caf-lz-provisioner-test.groovy
+  - file: /usr/local/eip-enterprise-caf-devealz000.groovy

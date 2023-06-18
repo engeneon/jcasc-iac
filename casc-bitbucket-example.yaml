@@ -1,0 +1,40 @@
+unclassified:
+  location:
+    url: http://0.0.0.0:8888/
+jenkins:
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        # create a user called admin
+        - id: "admin"
+          password: "admin"
+  authorizationStrategy: loggedInUsersCanDoAnything
+
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+      - usernamePassword:
+          id: "BITBUCKET_COMMON_CREDS"
+          username: "bb username"
+          password: "bb app key"
+          description: "BitBucket Repo Access Key"
+          scope: GLOBAL
+      - usernamePassword:
+          id: "DOCKERHUB_CREDENTIALS"
+          username: "dockerhub username"
+          password: "dockerhub password"
+          description: "Dockerhub Repo Access Key"
+          scope: GLOBAL
+
+#Ensure at least 1 executor available
+#pipelines:
+#  numExecutors: 1
+
+#Job Definitions using job-dsl plugin
+jobs:
+  - file: /usr/local/eip-enterprise-caf-level0.groovy
+  - file: /usr/local/eip-enterprise-caf-level1.groovy
+  - file: /usr/local/eip-enterprise-caf-level2.groovy
+  - file: /usr/local/eip-enterprise-caf-level3.groovy
